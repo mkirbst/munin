@@ -12,7 +12,7 @@
 
 if [ "$1" = "config" ]
 then
-    echo 'graph_args -l 1 --vertical-label deduplication rate'
+    echo 'graph_args -l 0 --vertical-label deduplication rate'
     echo 'graph_title ZFS pools deduplication rate'
     echo 'graph_category zfs'
     echo 'graph_info This graph shows the deduplication rate of every zpool.'
