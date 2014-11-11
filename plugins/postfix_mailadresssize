@@ -5,6 +5,7 @@
 TMPFILE="/tmp/mailadresssize.tmp"
 
 find /var/vmail/* -mindepth 1 -maxdepth 1 -exec du -sc {} \; | grep -v total | awk '{print $2 "/"$1}' | sort | awk 'BEGIN {FS="/"} {print $$
+# cat $TMPFILE
 
 if [ "$1" = "autoconf" ]; then
         echo yes 
@@ -15,20 +16,20 @@ if [ "$1" = "config" ]; then
 
         echo 'graph_title maildirs by size (ver.2014-11-11)'
         echo 'graph_args --base 1024 -l 0 '
-        echo 'graph_scale no'
+        echo 'graph_scale yes'          # we want human readable sizes like KB and MB
         echo 'graph_vlabel maildirsize'
         echo 'graph_category postfix'
 
         while read linelabels
         do
-                echo ${linelabels} | awk '{print $1".label "$1}'
+                echo ${linelabels} | awk '{print $1"AT"$2".label "$1"AT"$2}'
         done < $TMPFILE
         exit 0
 fi
 
 while read linelabels
 do
-        echo ${linelabels} | awk '{print $1".value "$2}'
+                echo ${linelabels} | awk '{print $1"AT"$2".value "$3}'
 done < $TMPFILE
 
 rm $TMPFILE
