@@ -4,6 +4,7 @@
 
 TMPFILE="/tmp/mailadresssize.tmp"
 
+# if your virtual mailaccounts stored under /var/vmail then you can leave this unmodified
 find /var/vmail/* -mindepth 1 -maxdepth 1 -exec du -sc {} \; | grep -v total | awk '{print $2 "/"$1}' | sort | awk 'BEGIN {FS="/"} {print $5" "$4" "$6}' | sed 's/\./_/g' > $TMPFILE
 
 if [ "$1" = "autoconf" ]; then
@@ -21,7 +22,9 @@ if [ "$1" = "config" ]; then
 
         while read linelabels
         do
-                echo ${linelabels} | awk '{print $1"AT"$2".label "$1"AT"$2}'
+                # printf doesnt output newline so we use this to get nice mail labels with @ and . 
+                echo ${linelabels} | awk '{printf $1"AT"$2".label "}'           # data source name:     mailATaddress_com
+                echo ${linelabels} | awk '{print  $1"@"$2}' | sed 's/_/\./g'    # date source label:    mail@address.com
         done < $TMPFILE
         exit 0
 fi
