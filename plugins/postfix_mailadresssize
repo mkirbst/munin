@@ -4,8 +4,7 @@
 
 TMPFILE="/tmp/mailadresssize.tmp"
 
-find /var/vmail/* -mindepth 1 -maxdepth 1 -exec du -sc {} \; | grep -v total | awk '{print $2 "/"$1}' | sort | awk 'BEGIN {FS="/"} {print $$
-# cat $TMPFILE
+find /var/vmail/* -mindepth 1 -maxdepth 1 -exec du -sc {} \; | grep -v total | awk '{print $2 "/"$1}' | sort | awk 'BEGIN {FS="/"} {print $5" "$4" "$6}' | sed 's/\./_/g' > $TMPFILE
 
 if [ "$1" = "autoconf" ]; then
         echo yes 
