@@ -4,8 +4,9 @@
 
 TMPFILE="/tmp/mailadresssize.tmp"
 
+# default sort order is by size of mail directory, if you dont like this then remove the sort at the end of the line
 # if your virtual mailaccounts stored under /var/vmail then you can leave this unmodified
-find /var/vmail/* -mindepth 1 -maxdepth 1 -exec du -sc {} \; | grep -v total | awk '{print $2 "/"$1}' | sort | awk 'BEGIN {FS="/"} {print $5" "$4" "$6}' | sed 's/\./_/g' > $TMPFILE
+find /var/vmail/* -mindepth 1 -maxdepth 1 -exec du -sc {} \; | grep -v total | awk '{print $2 "/"$1}' | awk 'BEGIN {FS="/"} {print $6 " " $5" "$4}' | sed 's/\./_/g' | sort -nr > $TMPFILE
 
 if [ "$1" = "autoconf" ]; then
         echo yes 
@@ -17,21 +18,21 @@ if [ "$1" = "config" ]; then
         echo 'graph_title maildirs by size (ver.2014-11-11)'
         echo 'graph_args --base 1024 -l 0 '
         echo 'graph_scale yes'          # we want human readable sizes like KB and MB
-        echo 'graph_vlabel maildirsize in bytes'
+        echo 'graph_vlabel maildirsize in Bytes'
         echo 'graph_category postfix'
 
         while read linelabels
         do
-                # printf doesnt output newline so we use this to get nice mail labels with @ and . 
-                echo ${linelabels} | awk '{printf $1"AT"$2".label "}'           # data source name:     mailATaddress_com
-                echo ${linelabels} | awk '{print  $1"@"$2}' | sed 's/_/\./g'    # date source label:    mail@address.com
+                # printf doesnt give newline so we use this to get nice mail labels with @ and . 
+                echo ${linelabels} | awk '{printf $2"AT"$3".label "}'           # data source name:     mailATaddress_com
+                echo ${linelabels} | awk '{print  $2"@"$3}' | sed 's/_/\./g'    # date source label:    mail@address.com
         done < $TMPFILE
         exit 0
 fi
 
 while read linelabels
 do
-                echo ${linelabels} | awk '{print $1"AT"$2".value "$3}'
+                echo ${linelabels} | awk '{print $2"AT"$3".value "$1}'
 done < $TMPFILE
 
 rm $TMPFILE
