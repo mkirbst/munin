@@ -24,6 +24,7 @@ if [ "$1" = "config" ]; then
         while read linelabels
         do
                 # printf doesnt give newline so we use this to get nice mail labels with @ and . 
+                # for data source name conventions in munin look at http://munin-monitoring.org/wiki/notes_on_datasource_names
                 echo ${linelabels} | awk '{printf $2"AT"$3".label "}'           # data source name:     mailATaddress_com
                 echo ${linelabels} | awk '{print  $2"@"$3}' | sed 's/_/\./g'    # date source label:    mail@address.com
         done < $TMPFILE
