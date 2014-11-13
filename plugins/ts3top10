@@ -57,6 +57,7 @@ if ($ARGV[0] and $ARGV[0] eq "config") {
                 $results[2] =~ s/[^a-zA-Z0-9_-]/_/g;    # replace every badchar with a underscore
                 $results[2] =~ s/_+/_/g;                # replace multiple underscores by one underscore to get nice short names
                 print $results[0].".label id".$results[0]."-".$results[2]."\n"; # id42: clientname - get rid of users with same name 
+                print $results[0].".colour COLOUR". $results[0]%29 ."\n"; # needed that every client(id) gets same colour by modulo 29, see http://munin-monitoring.org/wiki/fieldname.colour
         }
         $sth->finish();
 
