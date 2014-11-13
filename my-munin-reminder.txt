@@ -1,0 +1,6 @@
+my munin reminder
+--------------------------------------------------------------
+
+- data source names should consist only from a-zA-Z-_ see: http://munin-monitoring.org/wiki/notes_on_datasource_names
+
+- data sources with numbers should contain leading zeros, i got problems that not all of my data sources were drawed 
