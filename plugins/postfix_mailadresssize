@@ -6,7 +6,7 @@ TMPFILE="/tmp/mailadresssize.tmp"
 
 # default sort order is by size of mail directory, if you dont like this then remove the sort at the end of the line
 # if your virtual mailaccounts stored under /var/vmail then you can leave this unmodified
-find /var/vmail/* -mindepth 1 -maxdepth 1 -exec du -sc {} \; | grep -v total | awk '{print $2 "/"$1}' | awk 'BEGIN {FS="/"} {print $6 " " $5" "$4}' | sed 's/\./_/g' | sort -nr > $TMPFILE
+find /var/vmail/* -mindepth 1 -maxdepth 1 -exec du -bsc {} \; | grep -v total | awk '{print $2 "/"$1}' | awk 'BEGIN {FS="/"} {print $6 " " $5" "$4}' | sed 's/\./_/g' | sort -nr > $TMPFILE
 
 if [ "$1" = "autoconf" ]; then
         echo yes 
