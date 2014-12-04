@@ -13,7 +13,7 @@ my $LOGFILE  = "plugin_ts3_channels_current.log"; 		# watch this file for additi
 my $TS3_HOSTNAME = "127.0.0.1";
 my $TS3_HOSTPORT = "10011";
 my $TS3_QUERYLOGIN = "queryadmin";
-my $TS3_QUERYPASSWORD = "OmzjE41R";	# replace this example with your valid TS3 queryadmin server password
+my $TS3_QUERYPASSWORD = "SUPERSECRETPASSWORD";	# replace this example with your valid TS3 queryadmin server password
 
 #################
 ## telnet part ##
@@ -133,7 +133,3 @@ foreach my $channel ( @channels )
 		print ($CHANNELID.".value ".$CHANNELUSERCOUNT."\n");
 	}
 }
-                
-
-
-               
