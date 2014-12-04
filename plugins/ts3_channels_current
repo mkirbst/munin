@@ -7,13 +7,13 @@ use strict;
 use Net::Telnet;
 
 
-my $LOGFILE  = "/var/log/munin/plugin_ts3_channels_current"; 		# watch this file for additional debug output if the script can't poll information from the TS3 server
+my $LOGFILE  = "plugin_ts3_channels_current.log"; 		# watch this file for additional debug output if the script can't poll information from the TS3 server
 
 # TS3 server variables
 my $TS3_HOSTNAME = "127.0.0.1";
 my $TS3_HOSTPORT = "10011";
 my $TS3_QUERYLOGIN = "queryadmin";
-my $TS3_QUERYPASSWORD = "SUPERSECRETPASSW0RD";	# replace this example with your valid TS3 queryadmin server password
+my $TS3_QUERYPASSWORD = "OmzjE41R";	# replace this example with your valid TS3 queryadmin server password
 
 #################
 ## telnet part ##
@@ -30,6 +30,9 @@ $telnet->waitfor('/error id=0 msg=ok/i');
 $telnet->print("channellist");
 my @TELNETRAW = $telnet->waitfor('/error id=0 msg=ok/i');
 $telnet->close;
+
+##DEBUG
+## print (@TELNETRAW[0]);
 
 my @channels = split( '\|' , @TELNETRAW[0]);
 
@@ -51,6 +54,8 @@ if ($ARGV[0] and $ARGV[0] eq "config") {
 
 	foreach my $channel ( @channels )
 	{
+##		print ( "DEBUG: ".$channel );
+
 		my @channelline = split(' ', $channel);
 		foreach my $channelpart ( @channelline )
 		{
@@ -62,18 +67,23 @@ if ($ARGV[0] and $ARGV[0] eq "config") {
 				$CHANNELID = @TMPCHANNELID[1]
 			}
                         
-			## process client_nickname
+			## process channel_nickname
 			if ($channelpart =~ m/^channel_name=/)
 			{
 				# remove trailing channel_name= from string
 				my @TMPCHANNELNAME = split("=", $channelpart);
 				$CHANNELNAME = @TMPCHANNELNAME[1];
 				## clean CHANNELNAME from non-ascii as mysql database transforms into a blackhole and destroys earth if we feed it with unicode
-				$CHANNELNAME =~ s/[^a-zA-Z0-9_-]/_/g;
+#				$CHANNELNAME =~ s/[^a-zA-Z0-9_-]/_/g;
+				$CHANNELNAME =~ s/\\s/_/g;
 			}
 		}
 		$CHANNELID = sprintf("%04d", $CHANNELID);	# 
-		print ($CHANNELID.".label cid".$CHANNELID."_".$CHANNELNAME."\n");
+		
+		if(!($CHANNELNAME =~ m/spacer/))
+		{
+			print ($CHANNELID.".label cid".$CHANNELID."_".$CHANNELNAME."\n");
+		}
 	}
 	exit 0;
 }
@@ -91,6 +101,17 @@ foreach my $channel ( @channels )
 			my @TMPCHANNELID = split("=", $channelpart);
 			$CHANNELID = @TMPCHANNELID[1]
 		}
+
+		## process channel_nickname
+		if ($channelpart =~ m/^channel_name=/)
+		{
+			# remove trailing channel_name= from string
+			my @TMPCHANNELNAME = split("=", $channelpart);
+			$CHANNELNAME = @TMPCHANNELNAME[1];
+			## clean CHANNELNAME from non-ascii as mysql database transforms into a blackhole and destroys earth if we feed it with unicode
+#			$CHANNELNAME =~ s/[^a-zA-Z0-9_-]/_/g;
+			$CHANNELNAME =~ s/\\s/_/g;
+		}
                        
 		## process usercount per channel
 		if ($channelpart =~ m/^total_clients=/)
@@ -105,8 +126,12 @@ foreach my $channel ( @channels )
 			}
 		}
 	}
-	$CHANNELID = sprintf("%04d", $CHANNELID);	# 
-	print ($CHANNELID.".value ".$CHANNELUSERCOUNT."\n");
+
+	if(!($CHANNELNAME =~ m/spacer/))
+	{
+		$CHANNELID = sprintf("%04d", $CHANNELID);	# 
+		print ($CHANNELID.".value ".$CHANNELUSERCOUNT."\n");
+	}
 }
                 
 
