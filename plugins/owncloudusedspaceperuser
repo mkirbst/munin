@@ -1,6 +1,16 @@
 #!/bin/bash
 
 # monitors the diskspace for each owncloud user, but only the files directory of every user
+#
+# this plugin needs read permission to your owncloud/data dir, this can be done if you run the 
+# script with your webserver id. At my ubuntu box i had to add the following to the /etc/munin/plugin-conf.d/munin-node
+#
+#[owncloudspaceperuser]
+#user www-data
+#group www-data
+#
+#hint: Of course you have to remove the leading # if you put this in your config ;)
+
 
 TMPFILE="/tmp/owncloudusersize.tmp"
 touch $TMPFILE && rm -f $TMPFILE
