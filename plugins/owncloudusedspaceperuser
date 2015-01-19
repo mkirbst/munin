@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# monitors the diskspace for each owncloud user, but only the files directory of every user
+
+TMPFILE="/tmp/owncloudusersize.tmp"
+touch $TMPFILE && rm -f $TMPFILE
+
+for line in $(find /var/www/owncloud/data* -mindepth 1 -maxdepth 1 -type d ); do 
+     du -bcs "$line/files" | grep -v total | grep -v insgesamt | awk '{print $2 "/"$1}' | awk 'BEGIN {FS="/"} {print $8 " " $6}' >> $TMPFILE
+done
+
+## sort inplace by used space - user with most space used is on top
+sort -nr $TMPFILE -o $TMPFILE
+
+if [ "$1" = "autoconf" ]; then
+        echo yes 
+        exit 0
+fi
+
+if [ "$1" = "config" ]; then
+
+        echo 'graph_title owncloud users by used space (ver.2015-01-19)'
+        echo 'graph_args --base 1024 -l 0 '
+        echo 'graph_scale yes'          # we want human readable sizes like KB and MB
+        echo 'graph_vlabel used owncloud space in Bytes'
+        echo 'graph_category owncloud'
+
+        while read labels
+        do
+                echo ${labels} | awk '{printf $2".label " $2 "\n"}'    # owncloud username name as label
+        done < $TMPFILE
+        exit 0
+fi
+
+while read linelabels
+do
+                echo ${linelabels} | awk '{print $2".value "$1}'
+done < $TMPFILE
+
+rm $TMPFILE
