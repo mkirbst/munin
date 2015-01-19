@@ -5,7 +5,7 @@
 # this plugin needs read permission to your owncloud/data dir, this can be done if you run the 
 # script with your webserver id. At my ubuntu box i had to add the following to the /etc/munin/plugin-conf.d/munin-node
 #
-#[owncloudspaceperuser]
+#[owncloudusedspaceperuser]
 #user www-data
 #group www-data
 #
