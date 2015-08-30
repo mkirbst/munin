@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 #
 # Plugin to monitor deduplication ratio on zfs pools 
 #
@@ -6,30 +6,34 @@
 #
 #       config   (required)
 #
-# Magic markers (optional - only used by munin-config and some
-# installation scripts):
+# Please add proper permissions in your /etc/munin/plugin-conf.d/munin-node to fetch zfs info:
+#
+# [zfs*]
+#   user root
+#   group root
+#
 
+. $MUNIN_LIBDIR/plugins/plugin.sh
 
 if [ "$1" = "config" ]
 then
-    echo 'graph_args -l 0 --vertical-label deduplication rate'
-    echo 'graph_title ZFS pools deduplication rate'
-    echo 'graph_category zfs'
-    echo 'graph_info This graph shows the deduplication rate of every zpool.'
-
-    ((n=0))
-    for i in `zpool list | egrep -v "^NAME" | awk '{print $1}'`;
-    do
-        ((n++))
-        echo "pool$n.label "$i;
-    done
-    exit 0
+        echo 'graph_title zfs deduplication rate per pool'
+        echo 'graph_args --base 1000 -l 0'
+        echo 'graph_vlabel deduplication rate '
+        echo 'graph_scale no'
+        echo 'graph_category zfs'
+        ((n=0))
+        for i in `zpool list | egrep -v "^NAME" | awk '{print $1}'`
+        do
+                ((n++))
+                echo "pool$n.label "$i;
+        done
+        exit 0
 fi
 
 ((n=0))
-for i in `zpool list | egrep -v "^NAME" | awk '{print $6}' | awk 'BEGIN {FS="x"} {print $1}'`;
+for i in `zpool list | egrep -v "^NAME" | awk '{print $8}' | awk 'BEGIN {FS="x"} {print $1}'`
 do
-    ((n++))
-    echo "pool$n.value "$i;
+        ((n++))
+        echo "pool$n.value "$i;
 done
-
